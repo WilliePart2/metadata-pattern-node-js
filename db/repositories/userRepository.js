@@ -1,7 +1,7 @@
 const { createReposytory } = require('../../metadata');
 const { inject } = require('../../core');
 const { entities } = require('../../constants');
-const { readDataFromEntityFields } = require('../readWriteHelpers');
+const { readDataFromEntityFields } = require('../../lib/readWriteHelpers');
 
 const userReposytoryFactory = ({
     userModel = inject({ model: entities.USER })
@@ -10,7 +10,7 @@ const userReposytoryFactory = ({
         const entityData = readDataFromEntityFields({
             entity: userEntity,
         });
-        
+
         const createdEntity = await userModel.create(entityData);
         userEntity.id = createdEntity._id;
 

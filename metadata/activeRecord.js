@@ -79,6 +79,8 @@ const createEntity = ({
         id: createFieldMap({ field: 'id' }),
       };
 
+      entity.id = {};
+
       Object.entries(entity)
         .forEach(([field, value]) => {
           if (value[FIELD_MARKER]) {

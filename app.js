@@ -1,13 +1,16 @@
 const express = require('express');
+const bodyParser = require('body-parser');
 const {
   models,
   entities: dbEntities,
   repositories,
   connection,
 } = require('./db');
+const services = require('./services');
 const { inject } = require('./core');
 const { entities } = require('./constants');
 const { metadataCore } = require('./metadata');
+const routes = require('./routes');
 
 const app = express();
 connection();
@@ -21,8 +24,15 @@ metadataCore({
   ],
   repositories: [
     repositories.userRepository,
+  ],
+  services: [
+    services.userService,
   ]
 });
+
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(routes);
 
 const userFrank = inject({ entity: entities.USER });
 userFrank.name = 'Frank';

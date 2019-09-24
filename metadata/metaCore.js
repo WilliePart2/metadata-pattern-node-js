@@ -2,9 +2,15 @@ const {
     registerEntityProvider,
     registerModelProvider,
     registerReposytoryProvider,
+    registerServiceProvider,
 } = require('../core/dataDI');
 
-const metadataCore = ({ models, entities, repositories }) => {
+const metadataCore = ({
+    models = [],
+    entities = [], 
+    repositories = [],
+    services = [],
+}) => {
     models.forEach(model => {
         registerModelProvider(model);
     });
@@ -15,6 +21,10 @@ const metadataCore = ({ models, entities, repositories }) => {
 
     entities.forEach(entity => {
         registerEntityProvider(entity);
+    });
+
+    services.forEach(service => {
+        registerServiceProvider(service);
     });
 };
 

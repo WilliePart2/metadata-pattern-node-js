@@ -3,6 +3,7 @@ const {
   ENTITY_INJECTION_ID,
   MODEL_INJECTION_ID,
   REPOSYTORY_INJECTION_ID,
+  SERVICE_INJECTION_ID,
 } = require('../metadata/metaConstants');
 
 const registerEntityProvider = (entityProvider) => dataRegistry.set(
@@ -20,6 +21,11 @@ const registerReposytoryProvider = (reposytoryProvider) => dataRegistry.set(
   reposytoryProvider
 );
 
+const registerServiceProvider = (serviceProvider) => dataRegistry.set(
+  prefixServiceKey(serviceProvider[SERVICE_INJECTION_ID]),
+  serviceProvider
+);
+
 const provideEntity = (entityKey) => dataRegistry.get(
   prefixEntityKey(entityKey)
 );
@@ -31,6 +37,12 @@ const provideModel = (modelKey) => dataRegistry.get(
 const provideRepository = (repositoryKey) => dataRegistry.get(
   prefixRepositoryKey(repositoryKey)
 );
+
+const provideService = (serviceKey) => dataRegistry.get(
+  prefixServiceKey(serviceKey)
+);
+
+const prefixServiceKey = (serviceKey) => `SERVICE_${serviceKey}`;
 
 const prefixModelKey = (modelKey) => `MODEL_${modelKey}`;
 
@@ -48,7 +60,9 @@ module.exports = {
   provideEntity,
   provideModel,
   provideRepository,
+  provideService,
   registerEntityProvider,
   registerReposytoryProvider,
   registerModelProvider,
+  registerServiceProvider,
 };

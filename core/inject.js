@@ -1,6 +1,11 @@
-const { provideEntity, provideModel, provideRepository } = require('./dataDI');
+const {
+    provideEntity,
+    provideModel,
+    provideRepository,
+    provideService,
+} = require('./dataDI');
 
-const inject = ({ entity, reposytory, dto, model }) => {
+const inject = ({ entity, reposytory, model, service }) => {
     if (entity) {
         return provideEntity(entity);
     }
@@ -13,9 +18,8 @@ const inject = ({ entity, reposytory, dto, model }) => {
         return provideModel(model);
     }
 
-    if (dto) {
-        // it's just cork
-        return null;
+    if (service) {
+        return provideService(service);
     }
 }
 
