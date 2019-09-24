@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const { createModel } = require('../metadata');
+const { createModel } = require('../../metadata');
 const { entities } = require('../../constants');
 
 const schema = new mongoose.Schema({

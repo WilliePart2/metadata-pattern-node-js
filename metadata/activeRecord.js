@@ -1,7 +1,10 @@
-const { dataRegistry, createProvider } = require('../../core');
-const { prefixEntityKey, provideModel } = require('./dataDI');
-const { FIELD_MARKER, FIELDS_MAP, ENTITY_CORE_KEY } = require('./metaConstants');
-const { createEntityCore } = require('./standardEntityCore');
+const { createProvider, inject } = require('../core');
+const {
+  FIELD_MARKER,
+  FIELDS_MAP,
+  ENTITY_CORE_KEY,
+  ENTITY_INJECTION_ID,
+} = require('./metaConstants');
 
 const field = () => {
   return {
@@ -36,6 +39,7 @@ const bindFields = ({ model, fieldsMap }) => {
       }
 
       for (const [fieldName, fieldFn] of Object.entries(target[ENTITY_CORE_KEY])) {
+        // console.log(fieldName, fieldFn, key);
         if (fieldName === key) {
           return fieldFn;
         }
@@ -65,39 +69,38 @@ const createEntity = ({
   entityCore,
   entity,
 }) => {
-  if (!entityCore) {
-    entityCore = createEntityCore({
-      dbModel: provideModel(entityKey),
-      entityKey,
-    })
-  }
+  const entityProvider = createProvider({
+    factory: () => {
+      if (!entityCore) {
+        entityCore = inject({ reposytory: entityKey });
+      }
 
-  dataRegistry.set(
-    prefixEntityKey(entityKey),
-    createProvider({
-      factory: () => {
-        let fieldsMap = {};
+      let fieldsMap = {
+        id: createFieldMap({ field: 'id' }),
+      };
 
-        Object.entries(entity)
-          .forEach(([field, value]) => {
-            if (value[FIELD_MARKER]) {
-              fieldsMap[field] = createFieldMap({
-                field,
-                value: undefined,
-              });
-            }
-          });
-
-        entity[FIELDS_MAP] = fieldsMap;
-        entity[ENTITY_CORE_KEY] = entityCore;
-
-        return bindFields({
-          model: entity,
-          fieldsMap,
+      Object.entries(entity)
+        .forEach(([field, value]) => {
+          if (value[FIELD_MARKER]) {
+            fieldsMap[field] = createFieldMap({
+              field,
+              value: undefined,
+            });
+          }
         });
-      },
-    })
-  );
+
+      entity[FIELDS_MAP] = fieldsMap;
+      entity[ENTITY_CORE_KEY] = entityCore;
+
+      return bindFields({
+        model: entity,
+        fieldsMap,
+      });
+    },
+  });
+  entityProvider[ENTITY_INJECTION_ID] = entityKey;
+
+  return entityProvider;
 };
 
 module.exports = {
