@@ -1,6 +1,7 @@
 const { dataRegistry, createProvider } = require('../../core');
-const { prefixEntityKey } = require('./dataDI');
-const { FIELD_MARKER, FIELDS_MAP } = require('./metaConstants');
+const { prefixEntityKey, provideModel } = require('./dataDI');
+const { FIELD_MARKER, FIELDS_MAP, ENTITY_CORE_KEY } = require('./metaConstants');
+const { createEntityCore } = require('./standardEntityCore');
 
 const field = () => {
   return {
@@ -8,6 +9,9 @@ const field = () => {
   };
 };
 
+/**
+ * @todo: implement working with several field types + fetching field name by single interface
+ */
 const createFieldMap = ({ field, value }) => ({
   _field: field,
   _value: value,
@@ -28,6 +32,12 @@ const bindFields = ({ model, fieldsMap }) => {
       for (const [fieldName, fieldMap] of Object.entries(fieldsMap)) {
         if (fieldMap.getField() === key) {
           return fieldMap.get();
+        }
+      }
+
+      for (const [fieldName, fieldFn] of Object.entries(target[ENTITY_CORE_KEY])) {
+        if (fieldName === key) {
+          return fieldFn;
         }
       }
 
@@ -53,15 +63,22 @@ const bindFields = ({ model, fieldsMap }) => {
 const createEntity = ({
   entityKey,
   entityCore,
-  model,
+  entity,
 }) => {
+  if (!entityCore) {
+    entityCore = createEntityCore({
+      dbModel: provideModel(entityKey),
+      entityKey,
+    })
+  }
+
   dataRegistry.set(
     prefixEntityKey(entityKey),
     createProvider({
       factory: () => {
         let fieldsMap = {};
 
-        Object.entries(model)
+        Object.entries(entity)
           .forEach(([field, value]) => {
             if (value[FIELD_MARKER]) {
               fieldsMap[field] = createFieldMap({
@@ -71,10 +88,11 @@ const createEntity = ({
             }
           });
 
-        model[FIELDS_MAP] = fieldsMap;
+        entity[FIELDS_MAP] = fieldsMap;
+        entity[ENTITY_CORE_KEY] = entityCore;
 
         return bindFields({
-          model,
+          model: entity,
           fieldsMap,
         });
       },

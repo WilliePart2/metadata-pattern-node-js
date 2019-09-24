@@ -1,18 +1,26 @@
 const { entities } = require('../constants');
 const { field, createEntity } = require('./metadata/activeRecord');
 const { provideEntity } = require('./metadata/dataDI');
+const { createEntityCore } = require('./metadata/standardEntityCore');
+const { metadataCore } = require('./metadata/metaCode');
+const { userModel } = require('./models');
 
 const userEntity = {
   type: field(),
   name: field()
 };
 
+metadataCore({
+  models: [
+    userModel,
+  ],
+  entities: [],
+  repositories: []
+});
+
 createEntity({
   entityKey: entities.USER,
-  entityCore: {
-    
-  },
-  model: userEntity,
+  entity: userEntity,
 });
 
 const userBill = provideEntity(entities.USER);

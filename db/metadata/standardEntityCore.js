@@ -46,3 +46,7 @@ const createEntityCore = ({ dbModel, entityKey }) => ({
     });
   }
 });
+
+module.exports = {
+  createEntityCore,
+}
