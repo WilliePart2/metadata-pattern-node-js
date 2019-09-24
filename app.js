@@ -34,7 +34,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(routes);
 
-const user = inject({ entity: entities.USER });
+// const user = inject({ entity: entities.USER });
 
 const port = 3000;
 app.listen(port, () => {
