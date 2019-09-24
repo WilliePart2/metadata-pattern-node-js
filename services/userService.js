@@ -1,15 +1,15 @@
 const { createService } = require('../metadata');
-const { entities } = require('../constants');
+const { entities, fields } = require('../constants');
+const { rw } = require('../lib');
 
 const userService = {
     getUserDataFromRequest(request, entity) {
-        const { name, age, type } = request.body;
-
-        entity.name = name;
-        entity.age = age;
-        entity.type = type;
+        rw.writeDataToEntityFields({
+            data: request.body,
+            entity,
+            fieldsType: fields.API_FIELD
+        });
     },
-
 };
 
 module.exports = {

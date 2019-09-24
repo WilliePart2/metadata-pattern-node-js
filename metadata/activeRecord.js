@@ -6,17 +6,45 @@ const {
   ENTITY_INJECTION_ID,
 } = require('./metaConstants');
 
-const field = () => {
+const field = (fieldMetadata) => {
   return {
+    ...fieldMetadata,
     [FIELD_MARKER]: true,
   };
+};
+
+const createFieldsStore = (fieldsMetadata) => {
+  const result = {
+    default: undefined,
+    getFieldName(fieldType) {
+      if (!fieldType) {
+        return this.getDefaultField();
+      }
+
+      return this[fieldType];
+    },
+    getDefaultField() {
+      return this.default;
+    }
+  };
+
+  if (typeof fieldsMetadata !== 'object') {
+    result.default = fieldsMetadata;
+  } else {
+    Object.entries(fieldsMetadata)
+      .forEach(([fieldType, fieldName]) => {
+        result[fieldType] = fieldName;
+      });
+  }
+
+  return result;
 };
 
 /**
  * @todo: implement working with several field types + fetching field name by single interface
  */
 const createFieldMap = ({ field, value }) => ({
-  _field: field,
+  _field: createFieldsStore(field),
   _value: value,
   get() {
     return this._value;
@@ -24,8 +52,8 @@ const createFieldMap = ({ field, value }) => ({
   set(value) {
     this._value = value;
   },
-  getField() {
-    return this._field;
+  getField(type) {
+    return this._field.getFieldName(type);
   }
 });
 
@@ -84,8 +112,19 @@ const createEntity = ({
       Object.entries(entity)
         .forEach(([field, value]) => {
           if (value[FIELD_MARKER]) {
+            let preparedFields = {
+              default: field,
+            };
+
+            if (Object.keys(value).length) {
+              preparedFields = {
+                ...preparedFields,
+                ...value,
+              };
+            }
+
             fieldsMap[field] = createFieldMap({
-              field,
+              field: preparedFields,
               value: undefined,
             });
           }

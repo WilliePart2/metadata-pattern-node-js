@@ -34,14 +34,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(routes);
 
-const userFrank = inject({ entity: entities.USER });
-userFrank.name = 'Frank';
-userFrank.type = 'Employed';
-
-;(async () => {
-  const newUser = await userFrank.create(userFrank);
-})();
-
+const user = inject({ entity: entities.USER });
 
 const port = 3000;
 app.listen(port, () => {
